@@ -1,0 +1,66 @@
+
+services:
+
+  postgres:
+
+    image: postgres:18
+
+    container_name: postgres
+
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: admin123
+      POSTGRES_DB: cloud_task
+
+    ports:
+      - "5432:5432"
+
+    volumes:
+      - postgres_data:/var/lib/postgresql
+
+    networks:
+      - cloud-network
+
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d cloud_task"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+
+
+  taskapi:
+
+    build:
+      context: .
+      dockerfile: Dockerfile
+
+    image: cloud-task:v1
+
+    container_name: taskapi
+
+    ports:
+      - "8000:8000"
+
+    env_file:
+      - .env
+
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+    networks:
+      - cloud-network
+
+
+
+networks:
+
+  cloud-network:
+    driver: bridge
+
+
+
+volumes:
+
+  postgres_data:
