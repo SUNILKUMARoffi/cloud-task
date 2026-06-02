@@ -6,6 +6,7 @@ services:
     image: postgres:18
 
     container_name: postgres
+    restart: unless-stopped
 
     environment:
       POSTGRES_USER: postgres
@@ -38,7 +39,7 @@ services:
     image: cloud-task:v1
 
     container_name: taskapi
-
+    restart: unless-stopped
     ports:
       - "8000:8000"
 
